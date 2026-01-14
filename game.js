@@ -25,8 +25,8 @@ const gameOverSound = new Audio("assets/gameover.mp3");
 let player = {
   x: canvas.width / 2 - 30,
   y: canvas.height / 2,
-  w: 60,
-  h: 60
+  w: 300,
+  h: 300,
 };
 
 // ===== GAME DATA =====
@@ -46,8 +46,8 @@ setInterval(() => {
     enemies.push({
       x: canvas.width + 50,
       y: Math.random() * (canvas.height - 60),
-      w: 50,
-      h: 50,
+      w: 200,
+      h: 200,
       speed: 6
     });
   }
@@ -120,4 +120,5 @@ function endGame() {
 bg.onload = () => {
   bgMusic.play();
   gameLoop();
-};
+
+  };
