@@ -1,4 +1,6 @@
-const canvas = document.getElementById("game");
+const HITBOX_MARGIN = 80; // badha–ghata sakte ho
+const canvas = 
+document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
@@ -71,14 +73,14 @@ function gameLoop() {
     ctx.drawImage(enemyImg, e.x, e.y, e.w, e.h);
 
     // Collision
-    if (
-      player.x < e.x + e.w &&
-      player.x + player.w > e.x &&
-      player.y < e.y + e.h &&
-      player.y + player.h > e.y
-    ) {
-      endGame();
-    }
+  if (
+  player.x + HITBOX_MARGIN < e.x + e.w - HITBOX_MARGIN &&
+  player.x + player.w - HITBOX_MARGIN > e.x + HITBOX_MARGIN &&
+  player.y + HITBOX_MARGIN < e.y + e.h - HITBOX_MARGIN &&
+  player.y + player.h - HITBOX_MARGIN > e.y + HITBOX_MARGIN
+) {
+  endGame();
+}
 
     if (e.x < -60) {
       enemies.splice(i, 1);
