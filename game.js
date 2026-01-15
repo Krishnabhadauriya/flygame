@@ -88,8 +88,8 @@ function spawnEnemy() {
   enemies.push({
     x: canvas.width + 100,
     y: Math.random() * (canvas.height - 150),
-    w: isType2 ? 200 : 210,
-    h: isType2 ? 200 : 210,
+    w: isType2 ? 100 : 200,
+    h: isType2 ? 100 : 200,
     type: isType2 ? 2 : 1
   });
 }
@@ -201,7 +201,7 @@ function gameLoop() {
   }
 
   // BOOST TIMER 5 SEC
-  if (speedActive && Date.now() - speedTimer > 5000) {
+  if (speedActive && Date.now() - speedTimer > 10000) {
     speedActive = false;
     playerSpeed = 30; // normal
   }
@@ -238,5 +238,11 @@ function endGame() {
 
 // ===== START =====
 bg.onload = () => {
-  gameLoop();
+  // User click / tap pe game start
+  canvas.addEventListener("click", startGameOnce, { once: true });
+  canvas.addEventListener("touchstart", startGameOnce, { once: true });
 };
+
+function startGameOnce() {
+  gameLoop(); // game start
+}
