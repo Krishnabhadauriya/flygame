@@ -40,6 +40,7 @@ let player = {
   y: canvas.height / 2,
   w: 300,
   h: 300
+  
 };
 
 // ===== GAME DATA =====
@@ -86,11 +87,11 @@ function increaseDifficulty() {
 function spawnEnemy() {
   let isType2 = score >= 100 && Math.random() < 0.3;
   enemies.push({
-    x: canvas.width + 100,
+    x: canvas.width + 65,
     y: Math.random() * (canvas.height - 150),
-    w: isType2 ? 100 : 200,
-    h: isType2 ? 100 : 200,
-    type: isType2 ? 2 : 1
+    w: isType2 ? 200 : 300,
+    h: isType2 ? 200 : 300,
+    type: isType2 ? 2 :1
   });
 }
 
@@ -165,6 +166,14 @@ function gameLoop() {
 
       // Score 50 → spawn speed power
       if (score === 50) {
+        spawnSpeedPower();
+      }
+      // Score 185 → spawn speed power
+      if (score === 185) {
+        spawnSpeedPower();
+      }
+      // Score 300 → spawn speed power
+      if (score === 300) {
         spawnSpeedPower();
       }
     }
