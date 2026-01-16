@@ -7,3 +7,62 @@ body {
 canvas {
   display: block;
 }
+
+.png{
+  size: 30px;
+}
+
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+#startScreen {
+  position: fixed;
+  inset: 0;
+  background: url("assets/start-bg.png") no-repeat center/cover;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  padding-top: 80px;   /* 👈 thoda neeche */
+
+  z-index: 10;
+  text-align: center;
+}
+
+#titleImg {
+  width: 260px;
+  margin-bottom: 30px;
+}
+
+#startBtn {
+  font-size: 22px;
+  padding: 12px 36px;
+  border: none;
+  border-radius: 14px;
+  background: #ff9800;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  #titleImg {
+    width: 320px;
+    margin-bottom: 40px;
+  }
+
+  #startBtn {
+    font-size: 28px;
+    padding: 18px 60px;
+  }
+}
+#adContainer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 1000;
+}

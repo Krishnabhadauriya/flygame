@@ -1,3 +1,27 @@
+let gameStarted = false;
+
+const startScreen = document.getElementById("startScreen");
+const startBtn = document.getElementById("startBtn");
+
+// background music
+const bgMusic = new Audio("assets/bgmusic.mp3");
+bgMusic.loop = true;
+bgMusic.volume = 0.5;
+
+startBtn.addEventListener("click", startGame);
+
+function startGame() {
+  startScreen.style.display = "none";
+  gameStarted = true;
+
+  score = 0;
+  enemies = [];
+  gameOver = false;
+
+  bgMusic.play().catch(() => {}); // 🔥 safe play
+
+  gameLoop();
+}
 // ===== CONFIG =====
 const HITBOX_MARGIN = 80;
 
