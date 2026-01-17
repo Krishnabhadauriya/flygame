@@ -1,29 +1,11 @@
 let gameStarted = false;
 
-const startScreen = document.getElementById("startScreen");
-const startBtn = document.getElementById("startBtn");
-
-// background music
-const bgMusic = new Audio("assets/bgmusic.mp3");
-bgMusic.loop = true;
-bgMusic.volume = 0.5;
-
-startBtn.addEventListener("click", startGame);
-
-function startGame() {
-  startScreen.style.display = "none";
-  gameStarted = true;
-
-  score = 0;
-  enemies = [];
-  gameOver = false;
-
-  bgMusic.play().catch(() => {}); // 🔥 safe play
-
-  gameLoop();
-}
 // ===== CONFIG =====
 const HITBOX_MARGIN = 80;
+
+// ===== ELEMENTS =====
+const startScreen = document.getElementById("startScreen");
+const startBtn = document.getElementById("startBtn");
 
 // ===== CANVAS =====
 const canvas = document.getElementById("game");
@@ -31,7 +13,7 @@ const ctx = canvas.getContext("2d");
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.height = window.innerHeight  // header + footer space
 }
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
@@ -50,11 +32,10 @@ const enemy2Img = new Image();
 enemy2Img.src = "assets/enemy2.png";
 
 const speedImg = new Image();
-speedImg.src = "assets/speed.png"; // 🔥 SPEED POWER-UP PNG
+speedImg.src = "assets/speed.png";
 
 // ===== SOUNDS =====
 const gameOverSound = new Audio("assets/gameover.mp3");
-
 const boostSound = new Audio("assets/boost.mp3");
 boostSound.volume = 0.7;
 
@@ -62,9 +43,8 @@ boostSound.volume = 0.7;
 let player = {
   x: canvas.width * 0.1,
   y: canvas.height / 2,
-  w: 300,
-  h: 300
-  
+  w: 120,
+  h: 120
 };
 
 // ===== GAME DATA =====
@@ -72,11 +52,11 @@ let enemies = [];
 let score = 0;
 let gameOver = false;
 
-// SPEED POWER-UP
+// SPEED POWER
 let speedPower = null;
 let speedActive = false;
 let speedTimer = 0;
-let playerSpeed = 30; // normal speed
+let playerSpeed = 25;
 
 // difficulty
 let enemySpeed = 4;
@@ -84,16 +64,15 @@ let spawnGap = 1500;
 let lastSpawn = 0;
 
 // ===== CONTROLS =====
-// Desktop keyboard
 window.addEventListener("keydown", e => {
+  if (!gameStarted) return;
   if (e.key === "ArrowUp") player.y -= playerSpeed;
   if (e.key === "ArrowDown") player.y += playerSpeed;
 });
 
-// Mobile touch
 canvas.addEventListener("touchmove", e => {
-  let touchY = e.touches[0].clientY;
-  player.y = touchY - player.h / 2;
+  if (!gameStarted) return;
+  player.y = e.touches[0].clientY - player.h / 2;
 });
 
 // ===== DIFFICULTY =====
@@ -101,114 +80,80 @@ function increaseDifficulty() {
   if (score % 5 === 0) {
     enemySpeed += 0.5;
     spawnGap -= 100;
-
-    if (enemySpeed > 12) enemySpeed = 12;
-    if (spawnGap < 600) spawnGap = 600;
+    enemySpeed = Math.min(enemySpeed, 12);
+    spawnGap = Math.max(spawnGap, 600);
   }
 }
 
-// ===== SPAWN ENEMY =====
+// ===== SPAWN =====
 function spawnEnemy() {
-  let isType2 = score >= 100 && Math.random() < 0.3;
+  let type2 = score >= 100 && Math.random() < 0.3;
   enemies.push({
-    x: canvas.width + 65,
-    y: Math.random() * (canvas.height - 150),
-    w: isType2 ? 200 : 300,
-    h: isType2 ? 200 : 300,
-    type: isType2 ? 2 :1
+    x: canvas.width + 60,
+    y: Math.random() * (canvas.height - 120),
+    w: type2 ? 120 : 140,
+    h: type2 ? 120 : 140,
+    type: type2 ? 2 : 1
   });
 }
 
-// ===== SPAWN SPEED POWER-UP =====
 function spawnSpeedPower() {
   speedPower = {
-    x: canvas.width + 100,
-    y: Math.random() * (canvas.height - 100),
-    w: 80,
-    h: 80
+    x: canvas.width + 80,
+    y: Math.random() * (canvas.height - 80),
+    w: 60,
+    h: 60
   };
 }
 
 // ===== GAME LOOP =====
 function gameLoop() {
-  if (gameOver) return;
+  if (!gameStarted || gameOver) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Background
   ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-  // Player limit
   player.y = Math.max(0, Math.min(player.y, canvas.height - player.h));
 
-  // Player glow if speed active
   if (speedActive) {
     ctx.save();
     ctx.shadowColor = "cyan";
-    ctx.shadowBlur = 25;
+    ctx.shadowBlur = 20;
   }
 
-  // Player draw
   ctx.drawImage(playerImg, player.x, player.y, player.w, player.h);
-
   if (speedActive) ctx.restore();
 
-  // Spawn timing
   let now = Date.now();
   if (now - lastSpawn > spawnGap) {
     spawnEnemy();
     lastSpawn = now;
   }
 
-  // Enemies
   enemies.forEach((e, i) => {
     e.x -= enemySpeed;
+    ctx.drawImage(e.type === 2 ? enemy2Img : enemyImg, e.x, e.y, e.w, e.h);
 
-    // Draw enemy type
-    if (e.type === 2) {
-      ctx.drawImage(enemy2Img, e.x, e.y, e.w, e.h);
-    } else {
-      ctx.drawImage(enemyImg, e.x, e.y, e.w, e.h);
-    }
-
-    // Collision (if speedActive → not out)
     if (
       !speedActive &&
-      player.x + HITBOX_MARGIN < e.x + e.w - HITBOX_MARGIN &&
-      player.x + player.w - HITBOX_MARGIN > e.x + HITBOX_MARGIN &&
-      player.y + HITBOX_MARGIN < e.y + e.h - HITBOX_MARGIN &&
-      player.y + player.h - HITBOX_MARGIN > e.y + HITBOX_MARGIN
-    ) {
-      endGame();
-    }
+      player.x + HITBOX_MARGIN < e.x + e.w &&
+      player.x + player.w - HITBOX_MARGIN > e.x &&
+      player.y + HITBOX_MARGIN < e.y + e.h &&
+      player.y + player.h - HITBOX_MARGIN > e.y
+    ) endGame();
 
-    // Enemy passed → score + difficulty
     if (e.x + e.w < 0) {
       enemies.splice(i, 1);
       score++;
       increaseDifficulty();
-
-      // Score 50 → spawn speed power
-      if (score === 50) {
-        spawnSpeedPower();
-      }
-      // Score 185 → spawn speed power
-      if (score === 185) {
-        spawnSpeedPower();
-      }
-      // Score 300 → spawn speed power
-      if (score === 300) {
-        spawnSpeedPower();
-      }
+      if ([50, 185, 300].includes(score)) spawnSpeedPower();
     }
   });
 
-  // SPEED POWER-UP DRAW
   if (speedPower && !speedActive) {
     speedPower.x -= 4;
     ctx.drawImage(speedImg, speedPower.x, speedPower.y, speedPower.w, speedPower.h);
 
-    // PICK UP
     if (
       player.x < speedPower.x + speedPower.w &&
       player.x + player.w > speedPower.x &&
@@ -217,31 +162,19 @@ function gameLoop() {
     ) {
       speedActive = true;
       speedTimer = Date.now();
-      playerSpeed = 60; // 🔥 2x speed
+      playerSpeed = 45;
       speedPower = null;
-
-      // SOUND
-      boostSound.currentTime = 0;
       boostSound.play();
     }
   }
 
-  // BOOST TEXT
-  if (speedActive) {
-    ctx.fillStyle = "cyan";
-    ctx.font = "20px Arial";
-    ctx.fillText("BOOST ACTIVE", canvas.width - 160, 40);
-  }
-
-  // BOOST TIMER 5 SEC
   if (speedActive && Date.now() - speedTimer > 10000) {
     speedActive = false;
-    playerSpeed = 30; // normal
+    playerSpeed = 25;
   }
 
-  // Score text
   ctx.fillStyle = "white";
-  ctx.font = "26px Arial";
+  ctx.font = "24px Arial";
   ctx.fillText("Score: " + score, 20, 40);
 
   requestAnimationFrame(gameLoop);
@@ -256,26 +189,21 @@ function endGame() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.fillStyle = "white";
-  ctx.font = "42px Arial";
-  ctx.fillText("GAME OVER", canvas.width / 2 - 140, canvas.height / 2);
-
-  ctx.font = "26px Arial";
-  ctx.fillText("Score: " + score, canvas.width / 2 - 60, canvas.height / 2 + 40);
-
-  ctx.font = "18px Arial";
-  ctx.fillText("Click / Tap to Restart", canvas.width / 2 - 90, canvas.height / 2 + 80);
+  ctx.font = "36px Arial";
+  ctx.fillText("GAME OVER", canvas.width / 2 - 110, canvas.height / 2);
+  ctx.font = "20px Arial";
+  ctx.fillText("Tap to Restart", canvas.width / 2 - 70, canvas.height / 2 + 40);
 
   canvas.addEventListener("click", () => location.reload(), { once: true });
-  canvas.addEventListener("touchstart", () => location.reload(), { once: true });
 }
 
-// ===== START =====
-bg.onload = () => {
-  // User click / tap pe game start
-  canvas.addEventListener("click", startGameOnce, { once: true });
-  canvas.addEventListener("touchstart", startGameOnce, { once: true });
-};
+// ===== START BUTTON =====
+startBtn.addEventListener("click", () => {
+  startScreen.style.display = "none";
+  canvas.style.display = "block";
 
-function startGameOnce() {
-  gameLoop(); // game start
-}
+  resizeCanvas();   // 🔥 VERY IMPORTANT
+
+  gameStarted = true;
+  gameLoop();
+});

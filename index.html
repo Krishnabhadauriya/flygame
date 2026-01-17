@@ -1,18 +1,28 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-  <title>Offline Sky Game</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sky Fly Game</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
- <div id="startScreen">
-  <img id="titleImg" src="assets/title.png" />
+<header>
+  <h1>Sky Fly Game</h1>
+  <nav>
+    <a href="about.html">About</a> | 
+    <a href="privacy.html">Privacy Policy</a>
+  </nav>
+</header>
+
+<div id="startScreen">
+  <img src="assets/title.png" id="gameTitle" alt="Sky Fly Game">
   <button id="startBtn">START</button>
 </div>
 <canvas id="game"></canvas>
-
-<canvas id="game"></canvas>
+<footer>
+  <p>© 2026 Sky Fly Game</p>
+</footer>
 
 <script src="game.js"></script>
 </body>
